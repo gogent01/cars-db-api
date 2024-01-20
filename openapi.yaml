@@ -1,0 +1,259 @@
+openapi: 3.0.3
+info:
+  title: API for the car database
+  description: Specification of an API for a car database. Supports user authentication, and all CRUD operations on a Car model.
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+
+tags:
+  - name: Health
+  - name: User
+  - name: Car
+
+paths:
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: API health status
+      description: A check for API availability
+      responses:
+        '200':
+          description: API is available
+  /health/db:
+    get:
+      tags:
+        - Health
+      summary: Database health status
+      description: A check for the database availability
+      responses:
+        '200':
+          description: Database is available
+        '503':
+          description: Database is unavailable
+  /user/auth:
+    post:
+      tags:
+        - User
+      summary: User authentication
+      description: Authenticate user by login and password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '404':
+          description: User with specified credentials not found
+  /cars:
+    post:
+      tags:
+        - Car
+      summary: Add a car
+      description: Create a car with a specified brand, model, year and price
+      security:
+        - jwt: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Car'
+      responses:
+        '201':
+          description: Successful creation of a new car
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    get:
+      tags:
+        - Car
+      summary: Get cars list
+      description: Get all cars with sorting applied by car brand, model, year and price
+      security:
+        - jwt: []
+      parameters:
+        - name: sort
+          in: query
+          description: Name of car model field to sort by
+          required: false
+          schema:
+            type: string
+            enum:
+              - brand
+              - model
+              - year
+              - price
+        - name: direction
+          in: query
+          description: Direction to sort by
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Car"
+        '401':
+            $ref: '#/components/responses/UnauthorizedError'
+  /cars/{_id}:
+    put:
+      tags:
+        - Car
+      summary: Update a car
+      description: Update info on a specified car
+      security:
+        - jwt: []
+      parameters:
+        - name: _id
+          in: path
+          required: true
+          description: An id of a car to update.
+          schema:
+            type: string
+            example: 507f1f77bcf86cd799439011
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Car'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Car with a specified id not found
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - Car
+      summary: Delete a car
+      description: Delete a document for a car of a specified id
+      security:
+        - jwt: []
+      parameters:
+        - name: _id
+          in: path
+          required: true
+          description: An id of a car to delete.
+          schema:
+            type: string
+            example: 507f1f77bcf86cd799439011
+      responses:
+        '204':
+          description: Successful deletion
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Car with a specified id not found
+
+
+components:
+    securitySchemes:
+      jwt:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+    schemas:
+      UserCredentials:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            example: user@example.com
+          password:
+            type: string
+            example: P4ssword!
+      Car:
+        type: object
+        required:
+          - brand
+          - model
+          - year
+          - price
+        properties:
+          _id:
+            type: string
+            example: 507f1f77bcf86cd799439011
+          brand:
+            type: string
+            example: Nissan
+          model:
+            type: string
+            example: Qashqai
+          year:
+            type: number
+            example: 2019
+          price:
+            type: number
+            example: 1700000
+      UnauthorizedError:
+        type: object
+        properties:
+          message:
+            type: string
+            example: Authorization error
+      ValidationError:
+        type: object
+        properties:
+          message:
+            type: string
+            example: Validation error
+          details:
+            type: array
+            items:
+              type: object
+              properties:
+                field:
+                  type: string
+                  example: property_name
+                message:
+                  type: string
+                  example: Field 'property_name' is required.
+    responses:
+      UnauthorizedError:
+        description: Access token is missing or invalid
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnauthorizedError'
+      ValidationError:
+        description: Some of required fields are missing or have invalid values
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationError'
