@@ -23,7 +23,11 @@ export class MongoDBService {
   async connect(): Promise<void> {
     if (this.connection) return;
 
-    const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true`;
+    const DB_USER = process.env.DB_USER;
+    const DB_PASSWORD = process.env.DB_PASSWORD;
+    const DB_URL = process.env.DB_URL;
+    const DB_NAME = process.env.NODE_ENV === 'test' ? process.env.DB_NAME_TEST : process.env.DB_NAME;
+    const url = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_URL}/${DB_NAME}?retryWrites=true`;
     const connection = await mongoose.connect(url).catch((error) => {
       Promise.reject(error);
     });
