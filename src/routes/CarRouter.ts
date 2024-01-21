@@ -6,6 +6,7 @@ import { CarValidationMiddleware } from '../middleware/CarValidationMiddleware';
 import { ValidationMiddleware } from '../middleware/ValidationMiddleware';
 import { MongoCarCtrl } from '../controllers/MongoCarCtrl';
 import { InternalServerErrorException } from '../errors/InternalServerErrorException';
+import { NotFoundException } from '../errors/NotFoundException';
 
 const CarRouter = express.Router();
 const auth = new AuthMiddleware();
@@ -90,6 +91,9 @@ CarRouter.put(
 
     const carCtrl = new MongoCarCtrl();
     const updatedCar = await carCtrl.update(car).catch((error) => {
+      if (error.message === 'car_not_found') {
+        return next(new NotFoundException('car_not_found'));
+      }
       return next(new InternalServerErrorException());
     });
 
@@ -107,6 +111,9 @@ CarRouter.delete(
 
     const carCtrl = new MongoCarCtrl();
     const deletedCar = await carCtrl.delete(carId).catch((error) => {
+      if (error.message === 'car_not_found') {
+        return next(new NotFoundException('car_not_found'));
+      }
       return next(new InternalServerErrorException());
     });
 

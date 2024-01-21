@@ -56,6 +56,8 @@ paths:
                     type: string
         '404':
           description: User with specified credentials not found
+        '500':
+          description: Internal server error
   /cars:
     post:
       tags:
@@ -81,6 +83,8 @@ paths:
           $ref: '#/components/responses/AuthorizationError'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          description: Internal server error
     get:
       tags:
         - Car
@@ -120,6 +124,8 @@ paths:
                   $ref: "#/components/schemas/Car"
         '401':
             $ref: '#/components/responses/AuthorizationError'
+        '500':
+          description: Internal server error
   /cars/{_id}:
     put:
       tags:
@@ -155,6 +161,8 @@ paths:
           description: Car with a specified id not found
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          description: Internal server error
     delete:
       tags:
         - Car
@@ -177,6 +185,8 @@ paths:
           $ref: '#/components/responses/AuthorizationError'
         '404':
           description: Car with a specified id not found
+        '500':
+          description: Internal server error
 
 
 components:

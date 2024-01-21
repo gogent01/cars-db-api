@@ -35,6 +35,8 @@ export class MongoCarCtrl extends CarCtrl {
       throw new Error('db_error_update_car');
     });
 
+    if (updatedCar === null) throw new Error('car_not_found');
+
     return updatedCar.toCar();
   }
 
@@ -42,6 +44,8 @@ export class MongoCarCtrl extends CarCtrl {
     const deletedCar = await CarModel.findById(_id).catch((error) => {
       throw new Error('db_error_find_car');
     });
+    if (deletedCar === null) throw new Error('car_not_found');
+
     await CarModel.deleteOne({ _id }).catch((error) => {
       throw new Error('db_error_delete_car');
     });
