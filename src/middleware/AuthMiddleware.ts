@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { TokenService } from './TokenService';
+import { TokenService } from '../services/TokenService';
 import { AuthRequest } from '../types';
 import { AuthorizationException } from '../errors/AuthorizationException';
 
