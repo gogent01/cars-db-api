@@ -19,13 +19,13 @@ export type Car = {
 };
 
 export type CarFindOptions = {
-  filter: CarFilterOptions;
-  sort: CarSortOptions;
+  filter?: CarFilterOptions;
+  sort?: CarSortOptions;
 };
 
 type CarFilterOptions = Partial<Omit<Car, '_id'>>;
 
 type CarSortOptions = {
-  field?: keyof Omit<Car, '_id'>;
+  field: keyof Omit<Car, '_id'>;
   direction?: 'ASC' | 'DESC';
 };
