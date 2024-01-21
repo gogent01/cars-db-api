@@ -1,4 +1,5 @@
-import { app } from './src/app';
+import { App } from './src/App';
 
 const PORT: string = process.env.PORT || '3000';
-app.listen(PORT, () => console.log(`Cars DB API has been launched on port ${PORT}! 🚀`));
+const app = new App(PORT);
+app.launch();
