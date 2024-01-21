@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 export type User = {
   _id?: string;
   email: string;
@@ -6,9 +8,9 @@ export type User = {
 
 export type UserCredentials = Pick<User, 'email' | 'password'>;
 
-export type AuthUserData = {
-  _id: string;
-};
+export interface AuthRequest extends Request {
+  userId: string;
+}
 
 export type Car = {
   _id?: string;

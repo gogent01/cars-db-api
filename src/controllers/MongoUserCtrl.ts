@@ -25,9 +25,10 @@ export class MongoUserCtrl extends UserCtrl {
     }
 
     const user = storedUser.toJSON() as Required<User>;
-    await bcrypt.compare(credentials.password, user.password).catch((error) => {
+    const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password).catch((error) => {
       throw new Error('user_not_found');
     });
+    if (!isPasswordCorrect) throw new Error('user_not_found');
 
     const tokenService = new TokenService();
     const authToken = await tokenService.createAuthToken(user).catch((error) => {
