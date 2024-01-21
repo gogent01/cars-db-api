@@ -1,6 +1,6 @@
 {
   "name": "cars-db-api",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An API for a car database, holding info on car brands, models, year of manufacturing, price and more",
   "main": "index.ts",
   "scripts": {
