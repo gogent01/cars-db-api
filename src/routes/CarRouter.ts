@@ -1,9 +1,11 @@
 import express from 'express';
 import type { Response, NextFunction } from 'express';
-import { AuthRequest } from '../types';
+import { AuthRequest, Car, CarFindOptions } from '../types';
 import { AuthMiddleware } from '../middleware/AuthMiddleware';
 import { CarValidationMiddleware } from '../middleware/CarValidationMiddleware';
 import { ValidationMiddleware } from '../middleware/ValidationMiddleware';
+import { MongoCarCtrl } from '../controllers/MongoCarCtrl';
+import { InternalServerErrorException } from '../errors/InternalServerErrorException';
 
 const CarRouter = express.Router();
 const auth = new AuthMiddleware();
@@ -20,8 +22,26 @@ CarRouter.get(
   carChecks.sort,
   carChecks.direction,
   validation.processValidationErrors,
-  (req: AuthRequest, res: Response, next: NextFunction) => {
-    return res.status(405).send();
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const options: CarFindOptions = {
+      filter: {
+        brand: (req.query.brand as string) || undefined,
+        model: (req.query.model as string) || undefined,
+        year: req.query.year ? parseInt(req.query.year as string, 10) : undefined,
+        price: req.query.price ? parseInt(req.query.price as string, 10) : undefined,
+      },
+      sort: {
+        field: (req.query.sort as keyof Omit<Car, '_id'>) || undefined,
+        direction: (req.query.direction as 'ASC' | 'DESC') || undefined,
+      },
+    };
+
+    const carCtrl = new MongoCarCtrl();
+    const cars = await carCtrl.find(options).catch((error) => {
+      return next(new InternalServerErrorException());
+    });
+
+    return res.json(cars);
   }
 );
 
@@ -33,8 +53,20 @@ CarRouter.post(
   carChecks.year,
   carChecks.price,
   validation.processValidationErrors,
-  (req: AuthRequest, res: Response, next: NextFunction) => {
-    return res.status(405).send();
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const car: Car = {
+      brand: req.body.brand,
+      model: req.body.model,
+      year: req.body.year,
+      price: req.body.price,
+    };
+
+    const carCtrl = new MongoCarCtrl();
+    const savedCar = await carCtrl.create(car).catch((error) => {
+      return next(new InternalServerErrorException());
+    });
+
+    return res.json(savedCar);
   }
 );
 
@@ -47,8 +79,21 @@ CarRouter.put(
   carChecks.year,
   carChecks.price,
   validation.processValidationErrors,
-  (req: AuthRequest, res: Response, next: NextFunction) => {
-    return res.status(405).send();
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const car: Required<Car> = {
+      _id: req.params.carId,
+      brand: req.body.brand,
+      model: req.body.model,
+      year: req.body.year,
+      price: req.body.price,
+    };
+
+    const carCtrl = new MongoCarCtrl();
+    const updatedCar = await carCtrl.update(car).catch((error) => {
+      return next(new InternalServerErrorException());
+    });
+
+    return res.json(updatedCar);
   }
 );
 
@@ -57,8 +102,15 @@ CarRouter.delete(
   auth.onlyAuth,
   carChecks.carId,
   validation.processValidationErrors,
-  (req: AuthRequest, res: Response, next: NextFunction) => {
-    return res.status(405).send();
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const { carId } = req.params;
+
+    const carCtrl = new MongoCarCtrl();
+    const deletedCar = await carCtrl.delete(carId).catch((error) => {
+      return next(new InternalServerErrorException());
+    });
+
+    return res.json(deletedCar);
   }
 );
 

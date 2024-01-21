@@ -4,7 +4,9 @@ import { CarModel } from '../models/CarModel';
 
 export class MongoCarCtrl extends CarCtrl {
   async create(car: Car): Promise<Car> {
-    const savedCar = await new CarModel(car).save();
+    const savedCar = await new CarModel(car).save().catch((error) => {
+      throw new Error('db_error_create_car');
+    });
 
     return savedCar.toCar();
   }
@@ -17,7 +19,9 @@ export class MongoCarCtrl extends CarCtrl {
         }
       : { brand: 1 };
 
-    const cars = await CarModel.find({ ...filters }, {}, { sort });
+    const cars = await CarModel.find({ ...filters }, {}, { sort }).catch((error) => {
+      throw new Error('db_error_find_cars');
+    });
 
     return cars.map((car) => car.toCar());
   }
@@ -27,14 +31,20 @@ export class MongoCarCtrl extends CarCtrl {
       car._id,
       { brand: car.brand, model: car.model, year: car.year, price: car.price },
       { new: true }
-    );
+    ).catch((error) => {
+      throw new Error('db_error_update_car');
+    });
 
     return updatedCar.toCar();
   }
 
   async delete(_id: string): Promise<Car> {
-    const deletedCar = await CarModel.findById(_id);
-    const deleteResult = await CarModel.deleteOne({ _id });
+    const deletedCar = await CarModel.findById(_id).catch((error) => {
+      throw new Error('db_error_find_car');
+    });
+    await CarModel.deleteOne({ _id }).catch((error) => {
+      throw new Error('db_error_delete_car');
+    });
 
     return deletedCar.toCar();
   }
