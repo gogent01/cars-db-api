@@ -1,11 +1,11 @@
 {
   "name": "cars-db-api",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "An API for a car database, holding info on car brands, models, year of manufacturing, price and more",
   "main": "index.ts",
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --ext \"ts,json\" --exec \"ts-node --files index.ts\"",
-    "test": "cross-env NODE_ENV=test jest --watch --detectOpenHandles"
+    "test": "cross-env NODE_ENV=test jest --watch"
   },
   "keywords": [
     "backend",
