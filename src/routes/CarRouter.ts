@@ -7,6 +7,7 @@ import { ValidationMiddleware } from '../middleware/ValidationMiddleware';
 import { MongoCarCtrl } from '../controllers/MongoCarCtrl';
 import { InternalServerErrorException } from '../errors/InternalServerErrorException';
 import { NotFoundException } from '../errors/NotFoundException';
+import { lchmodSync } from 'fs';
 
 const CarRouter = express.Router();
 const auth = new AuthMiddleware();
@@ -42,6 +43,8 @@ CarRouter.get(
       return next(new InternalServerErrorException());
     });
 
+    if (!cars) return;
+
     return res.json(cars);
   }
 );
@@ -67,6 +70,8 @@ CarRouter.post(
     const savedCar = await carCtrl.create(car).catch((error) => {
       return next(new InternalServerErrorException());
     });
+
+    if (!savedCar) return;
 
     return res.json(savedCar);
   }
@@ -99,6 +104,8 @@ CarRouter.put(
       return next(new InternalServerErrorException());
     });
 
+    if (!updatedCar) return;
+
     return res.json(updatedCar);
   }
 );
@@ -118,6 +125,8 @@ CarRouter.delete(
       }
       return next(new InternalServerErrorException());
     });
+
+    if (!deletedCar) return;
 
     return res.json(deletedCar);
   }

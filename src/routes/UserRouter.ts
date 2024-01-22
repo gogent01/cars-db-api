@@ -21,8 +21,10 @@ UserRouter.post(
     const userCtrl = new MongoUserCtrl();
     const token = await userCtrl.login({ email, password }).catch((error) => {
       if (error.message === 'user_not_found') return next(new NotFoundException('user_not_found'));
-      else return next(new InternalServerErrorException());
+      return next(new InternalServerErrorException());
     });
+
+    if (!token) return;
 
     return res.json({ token });
   }
