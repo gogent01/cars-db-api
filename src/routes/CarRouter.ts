@@ -7,7 +7,6 @@ import { ValidationMiddleware } from '../middleware/ValidationMiddleware';
 import { MongoCarCtrl } from '../controllers/MongoCarCtrl';
 import { InternalServerErrorException } from '../errors/InternalServerErrorException';
 import { NotFoundException } from '../errors/NotFoundException';
-import { lchmodSync } from 'fs';
 
 const CarRouter = express.Router();
 const auth = new AuthMiddleware();
@@ -17,10 +16,10 @@ const validation = new ValidationMiddleware();
 CarRouter.get(
   '/api/v1/cars',
   auth.onlyAuth,
-  carChecks.brand,
-  carChecks.model,
-  carChecks.year,
-  carChecks.price,
+  carChecks.brand.optional(),
+  carChecks.model.optional(),
+  carChecks.year.optional(),
+  carChecks.price.optional(),
   carChecks.sort,
   carChecks.direction,
   validation.processValidationErrors,
