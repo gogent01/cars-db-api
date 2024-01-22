@@ -16,10 +16,10 @@ const validation = new ValidationMiddleware();
 CarRouter.get(
   '/api/v1/cars',
   auth.onlyAuth,
-  carChecks.brand.optional(),
-  carChecks.model.optional(),
-  carChecks.year.optional(),
-  carChecks.price.optional(),
+  carChecks.brand,
+  carChecks.model,
+  carChecks.year,
+  carChecks.price,
   carChecks.sort,
   carChecks.direction,
   validation.processValidationErrors,
@@ -48,6 +48,7 @@ CarRouter.get(
 
 CarRouter.post(
   '/api/v1/cars',
+  auth.onlyAuth,
   validation.required(['brand', 'model', 'year', 'price']),
   carChecks.brand,
   carChecks.model,
