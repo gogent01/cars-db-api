@@ -11,7 +11,8 @@ const userChecks = new UserValidationMiddleware();
 const validation = new ValidationMiddleware();
 
 UserRouter.post(
-  'api/v1/user/auth',
+  '/api/v1/user/auth',
+  validation.required(['email', 'password']),
   userChecks.email,
   userChecks.password,
   validation.processValidationErrors,

@@ -2,6 +2,8 @@ import { check, param, ValidationChain } from 'express-validator';
 
 export class CarValidationMiddleware {
   carId: ValidationChain = param('carId')
+    .exists()
+    .isString()
     .trim()
     .notEmpty()
     .withMessage('id_required')
@@ -13,6 +15,8 @@ export class CarValidationMiddleware {
     .bail();
 
   brand: ValidationChain = check('brand')
+    .exists()
+    .isString()
     .trim()
     .notEmpty()
     .withMessage('brand_required')
@@ -23,17 +27,18 @@ export class CarValidationMiddleware {
     .bail();
 
   model: ValidationChain = check('model')
-    .trim()
+    .exists()
     .notEmpty()
+    .isString()
+    .trim()
     .withMessage('model_required')
     .bail()
-    .isString()
     .isLength({ max: 64 })
     .withMessage('model_invalid')
     .bail();
 
   year: ValidationChain = check('year')
-    .trim()
+    .exists()
     .notEmpty()
     .withMessage('year_required')
     .bail()
@@ -42,7 +47,7 @@ export class CarValidationMiddleware {
     .bail();
 
   price: ValidationChain = check('price')
-    .trim()
+    .exists()
     .notEmpty()
     .withMessage('price_required')
     .bail()
@@ -52,6 +57,7 @@ export class CarValidationMiddleware {
 
   sort: ValidationChain = check('sort')
     .optional()
+    .exists()
     .isString()
     .trim()
     .custom((value) => {
@@ -62,8 +68,10 @@ export class CarValidationMiddleware {
 
   direction: ValidationChain = check('direction')
     .optional()
+    .exists()
     .isString()
     .trim()
+    .toUpperCase()
     .custom((value) => {
       return typeof value === 'string' && ['ASC', 'DESC'].includes(value);
     })

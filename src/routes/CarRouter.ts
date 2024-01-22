@@ -48,7 +48,7 @@ CarRouter.get(
 
 CarRouter.post(
   '/api/v1/cars',
-  auth.onlyAuth,
+  validation.required(['brand', 'model', 'year', 'price']),
   carChecks.brand,
   carChecks.model,
   carChecks.year,
@@ -74,6 +74,7 @@ CarRouter.post(
 CarRouter.put(
   '/api/v1/cars/:carId',
   auth.onlyAuth,
+  validation.required(['brand', 'model', 'year', 'price']),
   carChecks.carId,
   carChecks.brand,
   carChecks.model,
