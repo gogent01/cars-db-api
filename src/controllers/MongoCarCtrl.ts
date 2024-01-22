@@ -13,13 +13,18 @@ export class MongoCarCtrl extends CarCtrl {
 
   async find(options?: CarFindOptions): Promise<Car[]> {
     const filters = options?.filter || {};
+    const meaningfulFilters = Object.keys(filters).reduce((acc, cur) => {
+      if (filters[cur] !== undefined) acc[cur] = filters[cur];
+      return acc;
+    }, {});
+
     const sort = options?.sort?.field
       ? {
           [options.sort.field]: (options.sort.direction || 'ASC') === 'ASC' ? 1 : -1,
         }
       : { brand: 1 };
 
-    const cars = await CarModel.find({ ...filters }, {}, { sort }).catch((error) => {
+    const cars = await CarModel.find({ ...meaningfulFilters }, {}, { sort }).catch((error) => {
       throw new Error('db_error_find_cars');
     });
 
